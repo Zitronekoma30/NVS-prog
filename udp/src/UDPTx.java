@@ -21,30 +21,40 @@ public class UDPTx {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         
-        int seqNumber = 0;
         int transmissionId = 1; // Beispiel-Wert
         byte[] data = new byte[1024];
         int bytesRead;
 
+        int seqNumber = 1;
         File fileObj = new File(file);
         long fileSize = fileObj.length();
         int maxSeqNumber = (int) Math.ceil((double) fileSize / 1024);
+
+        dos.writeInt(transmissionId);
+        dos.writeInt(seqNumber++);
+        dos.writeInt(maxSeqNumber);
+        dos.writeUTF(file);
+
+        // Send initial packet
+        byte[] initialPacket = baos.toByteArray();
+        DatagramPacket packet = new DatagramPacket(initialPacket, initialPacket.length, address, 4445);
+        socket.send(packet);
+
+        // Reset ByteArrayOutputStream
+        baos.reset();
+
+        // Now start sending file data
+        
 
         while ((bytesRead = fis.read(data)) != -1) {
             dos.writeInt(transmissionId);
             dos.writeInt(seqNumber++);
 
-            if (seqNumber == 0) {
-                // This is the first packet, so include maxSeqNumber and file name
-                dos.writeInt(maxSeqNumber);
-                dos.writeUTF(file);
-            }
-
             dos.write(data, 0, bytesRead);
             md.update(data, 0, bytesRead); // Update MD5 hash with the chunk of data
             
             buf = baos.toByteArray();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+            packet = new DatagramPacket(buf, buf.length, address, 4445);
             socket.send(packet);
             
             baos.reset(); // Reset the ByteArrayOutputStream for the next packet
@@ -56,7 +66,7 @@ public class UDPTx {
         dos.writeInt(seqNumber);
         dos.write(md5Hash);
         buf = baos.toByteArray();
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+        packet = new DatagramPacket(buf, buf.length, address, 4445);
         socket.send(packet);
 
         fis.close();
