@@ -30,6 +30,7 @@ public class UDPTx {
         long fileSize = fileObj.length();
         String fileName = fileObj.getName();
         int maxSeqNumber = (int) Math.ceil((double) fileSize / 1024);
+        maxSeqNumber += 1; // Add one for the final packet with the MD5 hash
 
         System.out.println("maxSeqNumber: " + maxSeqNumber);
         System.out.println("fileSize: " + fileSize);
