@@ -5,6 +5,9 @@ import hashlib
 # Create a UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+# Increase the socket's receive buffer size to 1MB
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024 * 1024)
+
 # Bind the socket to the port
 server_address = ('localhost', 4445)
 sock.bind(server_address)
