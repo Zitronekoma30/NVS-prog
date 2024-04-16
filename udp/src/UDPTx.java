@@ -25,15 +25,19 @@ public class UDPTx {
         byte[] data = new byte[1024];
         int bytesRead;
 
-        int seqNumber = 1;
+        int seqNumber = 0;
         File fileObj = new File(file);
         long fileSize = fileObj.length();
+        String fileName = fileObj.getName();
         int maxSeqNumber = (int) Math.ceil((double) fileSize / 1024);
+
+        System.out.println("maxSeqNumber: " + maxSeqNumber);
+        System.out.println("fileSize: " + fileSize);
 
         dos.writeInt(transmissionId);
         dos.writeInt(seqNumber++);
         dos.writeInt(maxSeqNumber);
-        dos.writeUTF(file);
+        dos.writeBytes(fileName);
 
         // Send initial packet
         byte[] initialPacket = baos.toByteArray();
