@@ -26,9 +26,20 @@ public class UDPTx {
         byte[] data = new byte[1024];
         int bytesRead;
 
+        File fileObj = new File(file);
+        long fileSize = fileObj.length();
+        int maxSeqNumber = (int) Math.ceil((double) fileSize / 1024);
+
         while ((bytesRead = fis.read(data)) != -1) {
             dos.writeInt(transmissionId);
             dos.writeInt(seqNumber++);
+
+            if (seqNumber == 0) {
+                // This is the first packet, so include maxSeqNumber and file name
+                dos.writeInt(maxSeqNumber);
+                dos.writeUTF(file);
+            }
+
             dos.write(data, 0, bytesRead);
             md.update(data, 0, bytesRead); // Update MD5 hash with the chunk of data
             
