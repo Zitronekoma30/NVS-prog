@@ -9,6 +9,7 @@ public class UDPTx {
     private DatagramSocket socket;
     private InetAddress address;
     private byte[] buf;
+    int dataLength = 2048;
 
     public UDPTx() throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
@@ -22,14 +23,14 @@ public class UDPTx {
         DataOutputStream dos = new DataOutputStream(baos);
         
         int transmissionId = 1; 
-        byte[] data = new byte[1024];
+        byte[] data = new byte[dataLength];
         int bytesRead;
 
         int seqNumber = 0;
         File fileObj = new File(file);
         long fileSize = fileObj.length();
         String fileName = fileObj.getName();
-        int maxSeqNumber = (int) Math.ceil((double) fileSize / 1024);
+        int maxSeqNumber = (int) Math.ceil((double) fileSize / dataLength);
         maxSeqNumber += 1; // Add one for the final packet with the MD5 hash
 
         System.out.println("maxSeqNumber: " + maxSeqNumber);
@@ -66,7 +67,7 @@ public class UDPTx {
         }
         
         // Send the final packet with MD5 hash
-        
+
         byte[] md5Hash = md.digest();
         dos.writeInt(transmissionId);
         dos.writeInt(seqNumber);

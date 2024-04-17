@@ -9,6 +9,7 @@ class UDPTx:
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.address = ('localhost', 4445)
+        self.datalen = 2048
 
     def send_file(self, file: str):
         with open(file, 'rb') as f:
@@ -16,7 +17,7 @@ class UDPTx:
             seq_number = 0
             file_size = os.path.getsize(file)
             file_name = os.path.basename(file)
-            max_seq_number = -(-file_size // 1024)  
+            max_seq_number = -(-file_size // self.datalen)  
             max_seq_number += 1  
 
             print("maxSeqNumber: ", max_seq_number)
@@ -30,7 +31,7 @@ class UDPTx:
             # Now start sending file data
             md5 = hashlib.md5()
             while True:
-                data = f.read(1024)
+                data = f.read(self.datalen)
                 if not data:
                     break
 
@@ -50,4 +51,4 @@ udp = UDPTx()
 
 current_time_ms = int(time.time() * 1000)
 print(f"Current time in milliseconds: {current_time_ms}")
-udp.send_file('D:/test.txt')
+udp.send_file("C:/Users/Leon/Pictures/image2.webp")
