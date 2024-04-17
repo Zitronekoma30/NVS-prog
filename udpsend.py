@@ -3,6 +3,7 @@ import os
 import hashlib
 import struct
 from typing import Tuple
+import time
 
 class UDPTx:
     def __init__(self):
@@ -11,12 +12,12 @@ class UDPTx:
 
     def send_file(self, file: str):
         with open(file, 'rb') as f:
-            transmission_id = 1  # Example value
+            transmission_id = 1  
             seq_number = 0
             file_size = os.path.getsize(file)
             file_name = os.path.basename(file)
-            max_seq_number = -(-file_size // 1024)  # Equivalent to Math.ceil(fileSize / 1024) in Java
-            max_seq_number += 1  # Add one for the final packet with the MD5 hash
+            max_seq_number = -(-file_size // 1024)  
+            max_seq_number += 1  
 
             print("maxSeqNumber: ", max_seq_number)
             print("fileSize: ", file_size)
@@ -47,4 +48,6 @@ class UDPTx:
 
 udp = UDPTx()
 
+current_time_ms = int(time.time() * 1000)
+print(f"Current time in milliseconds: {current_time_ms}")
 udp.send_file('D:/test.txt')

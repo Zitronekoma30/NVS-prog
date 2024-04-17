@@ -1,18 +1,17 @@
 import socket
 import struct
 import hashlib
+import time
 
 # Create a UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# Increase the socket's receive buffer size to 1MB
+# Increase socket receive buffer to 1MB
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024 * 1024)
 
-# Bind the socket to the port
 server_address = ('localhost', 4445)
 sock.bind(server_address)
 
-# Initialize MD5 hash object
 md5 = hashlib.md5()
 
 # Initialize variables
@@ -50,6 +49,10 @@ while True:
 
 # Check MD5 hash
 calculated_md5 = md5.digest()
+
+current_time_ms = int(time.time() * 1000)
+print(f"Current time in milliseconds: {current_time_ms}")
+
 if calculated_md5 == received_md5:
     print('File received successfully')
     with open(file_name, 'wb') as f:

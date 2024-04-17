@@ -21,7 +21,7 @@ public class UDPTx {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         
-        int transmissionId = 1; // Beispiel-Wert
+        int transmissionId = 1; 
         byte[] data = new byte[1024];
         int bytesRead;
 
@@ -56,16 +56,17 @@ public class UDPTx {
             dos.writeInt(seqNumber++);
 
             dos.write(data, 0, bytesRead);
-            md.update(data, 0, bytesRead); // Update MD5 hash with the chunk of data
+            md.update(data, 0, bytesRead); 
             
             buf = baos.toByteArray();
             packet = new DatagramPacket(buf, buf.length, address, 4445);
             socket.send(packet);
             
-            baos.reset(); // Reset the ByteArrayOutputStream for the next packet
+            baos.reset(); 
         }
         
         // Send the final packet with MD5 hash
+        
         byte[] md5Hash = md.digest();
         dos.writeInt(transmissionId);
         dos.writeInt(seqNumber);

@@ -67,6 +67,8 @@ public class UDPRx {
             byte[] calculatedMd5 = md5.digest();
             if (MessageDigest.isEqual(calculatedMd5, receivedMd5)) {
                 System.out.println("File received successfully");
+                var time = System.currentTimeMillis();
+                System.out.println("Time: " + time);
                 try (FileOutputStream fos = new FileOutputStream(fileName)) {
                     fos.write(fileData);
                 }
