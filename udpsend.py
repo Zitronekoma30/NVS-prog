@@ -6,10 +6,10 @@ from typing import Tuple
 import time
 
 class UDPTx:
-    def __init__(self):
+    def __init__(self, data_len: int = 1024):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.address = ('localhost', 4445)
-        self.datalen = 1024
+        self.datalen = data_len
 
     def send_file(self, file: str):
         with open(file, 'rb') as f:
@@ -45,10 +45,19 @@ class UDPTx:
             final_packet = struct.pack('!ii', transmission_id, seq_number) + md5_hash
             self.sock.sendto(final_packet, self.address)
 
-        self.sock.close()
+print("Which packet size? 1K/16K/64K")
+size = int(input("Type 1, 16 or 64: ")) * 1024
 
-udp = UDPTx()
+print("Which file to send? 1MB/10MB/50MB/100MB")
+file = input("Type 1, 10, 50 or 100: ")
+file_path = f"./TestFiles/{file}MB_file"
 
-current_time_ms = int(time.time() * 1000)
-print(f"Current time in milliseconds: {current_time_ms}")
-udp.send_file("C:/Users/Leon/Pictures/image2.webp")
+udp = UDPTx(size)
+
+for i in range(10):
+    udp.send_file(file_path)
+    print(f"Sent {file}MB file {i+1} times")
+    time.sleep(2)
+
+udp.sock.close()
+input("Press Enter to exit")
