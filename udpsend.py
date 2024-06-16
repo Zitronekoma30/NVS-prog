@@ -46,7 +46,7 @@ class UDPTx:
             self.sock.sendto(final_packet, self.address)
 
 print("Which packet size? 1K/16K/64K")
-size = int(input("Type 1, 16 or 64: ")) * 1024
+size = (int(input("Type 1, 16 or 64: ")) * 1024) - 64
 
 print("Which file to send? 1MB/10MB/50MB/100MB")
 file = input("Type 1, 10, 50 or 100: ")

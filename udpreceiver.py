@@ -26,7 +26,7 @@ def receive_file():
     print("listening on %s:%s" % server_address)
 
     while True:
-        data, _ = sock.recvfrom(4096)
+        data, _ = sock.recvfrom(1024*64)
 
         print(f"received {len(data)} bytes")
         
