@@ -9,7 +9,7 @@ class UDPTx:
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.address = ('localhost', 4445)
-        self.datalen = 2048
+        self.datalen = 1024
 
     def send_file(self, file: str):
         with open(file, 'rb') as f:

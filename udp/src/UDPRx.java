@@ -25,6 +25,8 @@ public class UDPRx {
             byte[] fileData = new byte[0];
             byte[] receivedMd5 = null;
 
+            long startTime = 0;
+
             System.out.println("Listening on localhost:4445");
 
             while (true) {
@@ -35,6 +37,7 @@ public class UDPRx {
                 System.out.println("Received " + packet.getLength() + " bytes");
 
                 if (transmissionId == -1) {
+                    startTime = System.currentTimeMillis();
                     // This is the first packet, get transmissionId, maxSeqNumber, and file name
                     transmissionId = ((data[0] & 0xFF) << 24) | ((data[1] & 0xFF) << 16) | ((data[2] & 0xFF) << 8) | (data[3] & 0xFF);
                     int seqNumber = ((data[4] & 0xFF) << 24) | ((data[5] & 0xFF) << 16) | ((data[6] & 0xFF) << 8) | (data[7] & 0xFF);
@@ -67,6 +70,7 @@ public class UDPRx {
             byte[] calculatedMd5 = md5.digest();
             if (MessageDigest.isEqual(calculatedMd5, receivedMd5)) {
                 System.out.println("File received successfully");
+                System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + "ms");
                 var time = System.currentTimeMillis();
                 System.out.println("Time: " + time);
                 try (FileOutputStream fos = new FileOutputStream(fileName)) {

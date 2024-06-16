@@ -30,6 +30,7 @@ while True:
     
     if not transmission_id:
         # This is the first packet, get transmissionId, maxSeqNumber, and file name
+        start_time = int(time.time() * 1000)
         transmission_id, seq_number, max_seq_number = struct.unpack('!iii', data[:12])
         file_name = data[12:].decode('utf-8', 'ignore')
         print('Receiving file:', file_name)
@@ -51,7 +52,7 @@ while True:
 calculated_md5 = md5.digest()
 
 current_time_ms = int(time.time() * 1000)
-print(f"Current time in milliseconds: {current_time_ms}")
+print(f"Time taken: {current_time_ms - start_time} ms")
 
 if calculated_md5 == received_md5:
     print('File received successfully')
