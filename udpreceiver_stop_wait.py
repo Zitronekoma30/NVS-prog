@@ -6,12 +6,14 @@ import time
 def receive_file():
     # Create a UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ack_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # Increase socket receive buffer to 1MB
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024 * 1024)
     print('starting up on %s port %s' % ('localhost', 4445))
 
-    server_address = ('localhost', 4445)
+    server_address = ('localhost', 4444)
+    server_ack_adress = ('localhost', 4447)
     sock.bind(server_address)
 
     md5 = hashlib.md5()
@@ -50,9 +52,9 @@ def receive_file():
             md5.update(data[8:])
             print(f"seq_number: {seq_number}")
         # send ACK with seq_number
-        time.sleep(1)
+        #time.sleep(0.01)
         ack = struct.pack('!ii', 2, seq_number) # TODO: Fix rec receiving it's own ack
-        sock.sendto(ack, server_address)
+        ack_sock.sendto(ack, server_ack_adress)
 
     # Check MD5 hash
     calculated_md5 = md5.digest()

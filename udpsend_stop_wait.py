@@ -9,19 +9,20 @@ class UDPTx:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 10485760)  # Increase send buffer size
         self.sock.settimeout(10)  # Set a timeout for socket operations
-        self.address = ('localhost', 4445)
+        self.address = ('localhost', 4444)
+        self.sock.bind(('localhost', 4447))
         self.datalen = data_len
 
-    def wait_for_ack(self, seq_num: int):
+    def wait_for_ack(self, seq_num: int, packet):
         while True:
             try:
                 ack, _ = self.sock.recvfrom(8)
                 ack = struct.unpack('!ii', ack)
-                print("Received ACK")
                 if ack[0] == 2:  # 2 is the ACK packet type
                     break
             except socket.timeout:
                 print(f"Timeout waiting for ACK for seq_num {seq_num}. Retrying...")
+                self.sock.sendto(packet, self.address)
                 # Resend the last packet if needed or handle the timeout as appropriate
                 # For example, you can break or continue based on your retry logic
                 continue
@@ -45,26 +46,26 @@ class UDPTx:
             initial_packet = struct.pack('!iii', transmission_id, seq_number, max_seq_number) + file_name.encode()
             self.sock.sendto(initial_packet, self.address)
 
-            self.wait_for_ack(seq_number)  # Block until ack packet is received
+            self.wait_for_ack(seq_number, initial_packet)  # Block until ack packet is received
 
             seq_number += 1
 
-            print("sent init")
+            #print("sent init")
 
             # Now start sending file data
             md5 = hashlib.md5()
             while True:
-                print("seqNumber: ", seq_number)
+                #print("seqNumber: ", seq_number)
                 data = f.read(self.datalen)
                 if not data:
                     break
 
                 packet = struct.pack('!ii', transmission_id, seq_number) + data
                 self.sock.sendto(packet, self.address)
-                print("sent reg")
+                #print("sent reg")
                 md5.update(data)
                 
-                self.wait_for_ack(seq_number)  # Block until ack packet is received
+                self.wait_for_ack(seq_number, packet)  # Block until ack packet is received
 
                 seq_number += 1
 
@@ -89,7 +90,7 @@ def start():
         udp.send_file(file_path)
         print(f"Sent {file}MB file {i+1} times")
         time.sleep(2)
-    if input("e to exit: ") != "e": start()
     udp.sock.close()
+    if input("e to exit: ") != "e": start()
 
 start()
