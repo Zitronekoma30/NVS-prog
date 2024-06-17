@@ -49,6 +49,10 @@ def receive_file():
             file_data += data[8:]
             md5.update(data[8:])
             print(f"seq_number: {seq_number}")
+        # send ACK with seq_number
+        time.sleep(1)
+        ack = struct.pack('!ii', 2, seq_number) # TODO: Fix rec receiving it's own ack
+        sock.sendto(ack, server_address)
 
     # Check MD5 hash
     calculated_md5 = md5.digest()

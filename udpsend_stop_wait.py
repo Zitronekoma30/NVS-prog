@@ -17,11 +17,11 @@ class UDPTx:
             try:
                 ack, _ = self.sock.recvfrom(8)
                 ack = struct.unpack('!ii', ack)
+                print("Received ACK")
                 if ack[0] == 2:  # 2 is the ACK packet type
                     break
             except socket.timeout:
                 print(f"Timeout waiting for ACK for seq_num {seq_num}. Retrying...")
-                break
                 # Resend the last packet if needed or handle the timeout as appropriate
                 # For example, you can break or continue based on your retry logic
                 continue
@@ -44,7 +44,12 @@ class UDPTx:
             # Send initial packet
             initial_packet = struct.pack('!iii', transmission_id, seq_number, max_seq_number) + file_name.encode()
             self.sock.sendto(initial_packet, self.address)
+
+            self.wait_for_ack(seq_number)  # Block until ack packet is received
+
             seq_number += 1
+
+            print("sent init")
 
             # Now start sending file data
             md5 = hashlib.md5()
@@ -56,9 +61,10 @@ class UDPTx:
 
                 packet = struct.pack('!ii', transmission_id, seq_number) + data
                 self.sock.sendto(packet, self.address)
+                print("sent reg")
                 md5.update(data)
                 
-                self.wait_for_ack(seq_number)  # Break until ack packet is received
+                self.wait_for_ack(seq_number)  # Block until ack packet is received
 
                 seq_number += 1
 
