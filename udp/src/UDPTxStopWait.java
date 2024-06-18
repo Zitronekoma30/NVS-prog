@@ -1,3 +1,5 @@
+package udp.src;
+
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -5,14 +7,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-public class UDPTx {
+public class UDPTxStopWait {
     private DatagramSocket socket;
     private InetAddress address;
     private int port = 4444;
     private int bindPort = 4447;
     private int dataLen;
 
-    public UDPTx(int dataLen) throws SocketException, UnknownHostException {
+    public UDPTxStopWait(int dataLen) throws SocketException, UnknownHostException {
         this.dataLen = dataLen;
         this.socket = new DatagramSocket(bindPort);
         this.socket.setSoTimeout(10000); // Set timeout to 10 seconds
@@ -117,7 +119,7 @@ public class UDPTx {
         int fileSize = scanner.nextInt();
         String filePath = "./TestFiles/" + fileSize + "MB_file";
 
-        UDPTx udp = new UDPTx(size);
+        UDPTxStopWait udp = new UDPTxStopWait(size);
 
         for (int i = 0; i < 1; i++) {
             udp.sendFile(filePath);
