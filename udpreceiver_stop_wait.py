@@ -25,12 +25,15 @@ def receive_file():
     file_data = b''
     received_md5 = None
 
+    bytes_received = 0 
+
     print("listening on %s:%s" % server_address)
 
     while True:
         data, _ = sock.recvfrom(1024*64)
 
         print(f"received {len(data)} bytes")
+        bytes_received += len(data)
         
         if not transmission_id:
             # This is the first packet, get transmissionId, maxSeqNumber, and file name
@@ -71,13 +74,15 @@ def receive_file():
         print('File was not received correctly')
 
     sock.close()
-    return receive_time
+    return receive_time, bytes_received
 
-times = []
+times_ms = []
+sizes_bytes = []
 files_sent = 0
 
 while True:
     files_sent += 1
-    rcv_time = receive_file()
-    times.append(rcv_time)
-    print(f"Average time: {sum(times) / len(times)} ms over {files_sent} files")
+    rcv_time, file_size = receive_file()
+    times_ms.append(rcv_time)
+    sizes_bytes.append(file_size)
+    print(f"Average MBps: {(sum(sizes_bytes) / 1e6) / (sum(times_ms) / 1000)} over {files_sent} files")
