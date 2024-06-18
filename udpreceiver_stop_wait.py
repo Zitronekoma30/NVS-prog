@@ -4,6 +4,8 @@ import hashlib
 import time
 import math
 
+TEST_RUNS = 10
+
 def receive_file():
     # Create a UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -93,7 +95,7 @@ while True:
     sizes_bytes.append(file_size)
     mbps = (sum(sizes_bytes) / 1e6) / (sum(times_ms) / 1000)
     print(f"Average MBps: {mbps} over {files_sent} files")
-    if files_sent == 10:
+    if files_sent == TEST_RUNS:
         store_result_in_txt(mbps, sizes_bytes[0])
         times_ms = []
         sizes_bytes = []

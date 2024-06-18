@@ -4,6 +4,8 @@ import hashlib
 import struct
 import time
 
+TEST_RUNS = 10
+
 class UDPTx:
     def __init__(self, data_len: int = 1024):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -87,7 +89,7 @@ def start():
         file_path = f"./TestFiles/{file_size}MB_file"
         udp = UDPTx(size)
 
-        for i in range(10):
+        for i in range(TEST_RUNS):
             udp.send_file(file_path)
             print(f"Sent {file_size}MB file {i+1} times")
             time.sleep(2)
