@@ -40,7 +40,7 @@ public class UDPReceiverStopWait {
             socket.receive(packet);
 
             int packetLength = packet.getLength();
-            System.out.println("received " + packetLength + " bytes");
+            //System.out.println("received " + packetLength + " bytes");
 
             ByteBuffer wrapped = ByteBuffer.wrap(packet.getData(), 0, packetLength);
 
@@ -73,7 +73,8 @@ public class UDPReceiverStopWait {
                 wrapped.get(data);
                 fileData.write(data);
                 md5.update(data);
-                System.out.println("seq_number: " + seqNumber);
+                System.out.print("\rseq_number: " + seqNumber);
+                System.out.flush();
             }
 
             // Send ACK with seq_number
@@ -90,6 +91,7 @@ public class UDPReceiverStopWait {
 
         long receiveTime = System.currentTimeMillis() - startTime;
         System.out.println("Time taken: " + receiveTime + " ms");
+        System.out.println("Speed: " + (fileData.size() / 1e6) / (receiveTime / 1000.0) + " MBps");
 
         if (MessageDigest.isEqual(calculatedMd5, receivedMd5)) {
             System.out.println("File received successfully");
