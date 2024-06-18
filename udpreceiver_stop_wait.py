@@ -2,6 +2,9 @@ import socket
 import struct
 import hashlib
 import time
+import math
+
+TEST_RUNS = 10
 
 def receive_file():
     # Create a UDP socket
@@ -25,12 +28,15 @@ def receive_file():
     file_data = b''
     received_md5 = None
 
+    bytes_received = 0 
+
     print("listening on %s:%s" % server_address)
 
     while True:
         data, _ = sock.recvfrom(1024*64)
 
-        print(f"received {len(data)} bytes")
+        #print(f"received {len(data)} bytes")
+        bytes_received += len(data)
         
         if not transmission_id:
             # This is the first packet, get transmissionId, maxSeqNumber, and file name
@@ -50,7 +56,7 @@ def receive_file():
                 break
             file_data += data[8:]
             md5.update(data[8:])
-            print(f"seq_number: {seq_number}")
+            print(f"\r{seq_number}/{max_seq_number}", end='')
         # send ACK with seq_number
         #time.sleep(0.01)
         ack = struct.pack('!ii', 2, seq_number) # TODO: Fix rec receiving it's own ack
@@ -71,13 +77,26 @@ def receive_file():
         print('File was not received correctly')
 
     sock.close()
-    return receive_time
+    return receive_time, bytes_received
 
-times = []
+def store_result_in_txt(speed, size):
+    size_in_mb = size / 1e6
+    with open("results.txt", "a") as f:
+        f.write(f"Avg. MBps for {math.floor(size_in_mb)}: {speed}\n")
+
+times_ms = []
+sizes_bytes = []
 files_sent = 0
 
 while True:
     files_sent += 1
-    rcv_time = receive_file()
-    times.append(rcv_time)
-    print(f"Average time: {sum(times) / len(times)} ms over {files_sent} files")
+    rcv_time, file_size = receive_file()
+    times_ms.append(rcv_time)
+    sizes_bytes.append(file_size)
+    mbps = (sum(sizes_bytes) / 1e6) / (sum(times_ms) / 1000)
+    print(f"Average MBps: {mbps} over {files_sent} files")
+    if files_sent == TEST_RUNS:
+        store_result_in_txt(mbps, sizes_bytes[0])
+        times_ms = []
+        sizes_bytes = []
+        files_sent = 0
