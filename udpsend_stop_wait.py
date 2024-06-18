@@ -80,17 +80,18 @@ def start():
     print("Which packet size? 1K/16K/64K")
     size = (int(input("Type 1, 16 or 64: ")) * 1024) - 64
 
-    print("Which file to send? 1MB/10MB/50MB/100MB")
-    file = input("Type 1, 10, 50 or 100: ")
-    file_path = f"./TestFiles/{file}MB_file"
+    #print("Which file to send? 1MB/10MB/50MB/100MB")
+    #file = input("Type 1, 10, 50 or 100: ")
+    file_sizes = ["1", "10", "50", "100"]
+    for file_size in file_sizes:
+        file_path = f"./TestFiles/{file_size}MB_file"
+        udp = UDPTx(size)
 
-    udp = UDPTx(size)
-
-    for i in range(1):
-        udp.send_file(file_path)
-        print(f"Sent {file}MB file {i+1} times")
-        time.sleep(2)
-    udp.sock.close()
+        for i in range(10):
+            udp.send_file(file_path)
+            print(f"Sent {file_size}MB file {i+1} times")
+            time.sleep(2)
+        udp.sock.close()
     if input("e to exit: ") != "e": start()
 
 start()
